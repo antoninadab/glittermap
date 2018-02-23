@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html>
+
+
+  <head>
+    <title>g l i t t e r ~ m a p</title>
+    <title>Marker animations with <code>setTimeout()</code></title>
+   
+    <meta name="viewport" content="initial-scale=1.0">
+
+    <meta charset="utf-8">
+    <style>
+    
+      #map {
+        height: 100%;
+        background-color: #3333ff;
+      }
+      
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+       
+      #floating-panel {
+        position: absolute;
+        top: 10px;
+        left: 25%;
+        z-index: 5;
+        background-color: #3333ff;
+        padding: 5px;
+        border: 1px solid #b3b3ff;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 5px;
+      }
+      #floating-panel {
+        margin-left: -52px;
+      }
+      #drop {
+        background-color: #b3b3ff;
+        }
+
+    </style>
+   <link rel="shortcut icon" href="https://n6-img-fp.akamaized.net/free-vector/pink-glitter-background_1085-779.jpg?size=338&ext=jpg">
+ </head>
+
+
+  <body>
+    <div id="map"></div>
+     
+   
+
+
+    <div id="floating-panel">
+      <button id="drop" onclick="drop()">pokaż ◙ </button>
+
+    </div>
+    <div id="map"></div>
+    
+    <script>
+	
+	// dodawanie znaczników
+	  var neighborhoods = [
+       
+    //{lat: 50.052998, lng: 19.944146}, //podbrzezie 2
+   
+    
+    {lat: 50.054096, lng: 19.945927}, // joselewicza z brzozowa skrzyżowanie
+    
+    {lat: 50.053573, lng: 19.944879}, //podbrzezie 5
+    {lat: 50.071643, lng: 19.928513}, // radio krk
+    {lat: 50.04928, lng: 19.964236}, // zabłocie warsztat 
+    {lat: 50.044992, lng: 19.962514}, // zabłocie przejście koło mocak 
+    {lat: 50.044826, lng: 19.962171}, // zabłocie przejście koło mocak 2
+    //{lat: 50.026961, lng: 19.938101}, // tory koło domu
+    //{lat: 50.026589,  lng: 19.936363}, // skrzyż koło tory koło dom
+    {lat: 50.062805 , lng: 19.934287}, // szewska 23
+    {lat: 50.062502,  lng: 19.934845},// szewska 30
+    //{lat: 50.063517,  lng: 19.932778}, // tetr bagatela przystanrk
+    //{lat: 50.063469 , lng: 19.932885}, // tteatr bagatela skrzyżowanie
+    //{lat: 50.063524 , lng: 19.931812}, // krupnicza 4
+    //{lat: 50.063497 , lng: 19.930289}, // krupnicza 8
+    {lat: 50.048397,  lng: 19.931055}, // monte casino pasy 
+    {lat: 50.049556,  lng: 19.934348},// most grunwaldzki  
+    {lat: 50.050466,  lng: 19.939337}, // dietla 
+    {lat: 50.05154,   lng: 19.941869}, // dietla 2
+    {lat: 50.043783,  lng: 19.946965}, // przystanke korona 
+    {lat: 50.044945,  lng: 19.945352}, // krakowska most 
+    {lat: 50.036959,  lng: 19.940535}, // matecznego rondo 
+    {lat: 50.064467,  lng: 19.942369}, // szpitalna - pijakrska skrzyż 
+    {lat: 50.06466,  lng: 19.941999}, // pijarska 
+    {lat: 50.072945,  lng: 19.920468}, // kazimierza wielkiego 54
+    {lat: 50.074508,  lng: 19.921369}, // urzędnicza sp
+    {lat: 50.074611,  lng: 19.923295}, // fryzjer koło mazowiecka 
+    {lat: 50.07541,  lng: 19.924877}, // mazowiecka 
+    {lat: 50.063606,  lng: 19.940293}, // floriańska 
+    {lat: 50.062141,  lng: 19.939244}, // floriańska przy mariackim
+    {lat:50.068252, lng: 19.966209}, // kasprowicza
+    {lat:50.066723, lng: 19.968956}, // rymarska- mogislka 
+    {lat:50.349249, lng: 18.890194}, // bytom wolne dworzec
+    {lat:50.349249, lng: 18.890194}, // bytom dworzec -  wolne tory 
+    {lat:50.347633, lng: 18.890387}, // bytom wolne tory
+    {lat:50.258988, lng: 19.018276}, // katowice 
+      ];
+
+      var markers = [];
+	  var map;
+	  
+//------------------------ Kolorowanie
+	  
+    function initMap() {
+       
+        var styledMapType = new google.maps.StyledMapType(
+            [
+              {elementType: 'geometry', stylers: [{color: '#ffccff'}]},
+              
+              {
+                featureType: 'administrative',
+                elementType: 'geometry.stroke',
+                stylers: [{color:  '#14050f'}]
+              },
+              {
+                featureType: 'administrative.land_parcel',
+                elementType: 'geometry.stroke',
+                stylers: [{color: '#7a1f5c'}]
+              },
+              {
+                featureType: 'administrative.land_parcel',
+                elementType: 'labels.text.fill',
+                stylers: [{color: '#14050f'}]
+              },
+              {
+                featureType: 'landscape.natural',
+                elementType: 'geometry',
+                stylers: [{color: '#6666ff'}]
+              },
+              {
+                featureType: 'poi',
+                elementType: 'geometry',
+                stylers: [{color: '#ff3399'}]
+              },
+              {
+                featureType: 'poi',
+                elementType: 'labels.text.fill',
+                stylers: [{color: '#862d59'}]
+              },
+              {
+                featureType: 'poi.park',
+                elementType: 'geometry.fill',
+                stylers: [{color: '#ff99ff'}]
+              },
+              {
+                featureType: 'poi.park',
+                elementType: 'labels.text.fill',
+                stylers: [{color: '#447530'}]
+              },
+              {
+                featureType: 'road',
+                elementType: 'geometry',
+                stylers: [{color: '#9999ff'}]
+              },
+              {
+                featureType: 'road.arterial',
+                elementType: 'geometry',
+                stylers: [{color: '  #ccccff'}]
+              },
+              {
+                featureType: 'road.highway',
+                elementType: 'geometry',
+                stylers: [{color: ' #660066'}]
+              },
+              {
+                featureType: 'road.highway',
+                elementType: 'geometry.stroke',
+                stylers: [{color: ' #e600e6'}]
+              },
+              {
+                featureType: 'road.highway.controlled_access',
+                elementType: 'geometry',
+                stylers: [{color: '#e98d58'}]
+              },
+              {
+                featureType: 'road.highway.controlled_access',
+                elementType: 'geometry.stroke',
+                stylers: [{color: '#ff3399'}]
+              },
+              {
+                featureType: 'road.local',
+                elementType: 'labels.text.fill',
+                stylers: [{color: '##ff0066'}]
+              },
+              {
+                featureType: 'transit.line',
+                elementType: 'geometry',
+                stylers: [{color: '##ff80b3'}]
+              },
+              {
+                featureType: 'transit.line',
+                elementType: 'labels.text.fill',
+                stylers: [{color: '#ff80b3'}]
+              },
+              {
+                featureType: 'transit.line',
+                elementType: 'labels.text.stroke',
+                stylers: [{color: '#ebe3cd'}]
+              },
+              {
+                featureType: 'transit.station',
+                elementType: 'geometry',
+                stylers: [{color: '#dfd2ae'}]
+              },
+              {
+                featureType: 'water',
+                elementType: 'geometry.fill',
+                stylers: [{color: ' # #ffff66'}]
+              },
+              {
+                featureType: 'water',
+                elementType: 'labels.text.fill',
+                stylers: [{color: '#8c4765'}]
+              }
+            ],
+            {name: 'Styled Map'
+
+          });
+
+       
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 50.052998, lng: 19.944146},
+          zoom: 14,
+          mapTypeControlOptions: {
+            mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'terrain',
+                    'styled_map']
+          }		  
+		  
+        });
+
+      
+        map.mapTypes.set('styled_map', styledMapType);
+        map.setMapTypeId('styled_map');
+		
+		
+			  
+	  /* RĘCZNE DODAWANIE MARKERA - POCZĄTEK 1 */ 
+		var wspolrzedneMarkera = {lat: 50.052998, lng: 19.944146};
+
+		 var contentString = '<div>'+ 
+		 '<img src="https://raw.githubusercontent.com/antoninadab/glittermap/ebe4f204ba6a4c145ec03ee60466a2fb23a5a56d/10.JPG">'+		
+		 '</div>';
+
+        var infowindow = new google.maps.InfoWindow({
+          content: contentString
+        });
+
+        var nowyMarker = new google.maps.Marker({
+          position: wspolrzedneMarkera,
+          map: map,
+          title: 'marker z okienkiem'
+        });
+        nowyMarker.addListener('click', function() {
+          infowindow.open(map, nowyMarker);
+        });
+		/* RĘCZNE DODAWANIE MARKERA - KONIEC */
+		
+    /* RĘCZNE DODAWANIE MARKERA - POCZĄTEK 2 */ 
+    var wspolrzedneMarkera2 =  {lat: 50.026961, lng: 19.938101};
+
+     var contentString2 = '<div>'+
+     '<img src="https://raw.githubusercontent.com/antoninadab/glittermap/ebe4f204ba6a4c145ec03ee60466a2fb23a5a56d/13.jpg">'+    
+     '</div>';
+
+        var infowindow2 = new google.maps.InfoWindow({
+          content: contentString2
+        });
+
+        var nowyMarker2 = new google.maps.Marker({
+          position: wspolrzedneMarkera2,
+          map: map,
+          title: 'marker z okienkiem2'
+        });
+        nowyMarker2.addListener('click', function() {
+          infowindow2.open(map, nowyMarker2);
+        });
+    /* RĘCZNE DODAWANIE MARKERA - KONIEC2 */
+		
+        /* RĘCZNE DODAWANIE MARKERA - POCZĄTEK 3 */ 
+    var wspolrzedneMarkera3 =  {lat: 50.026589,  lng: 19.936363};
+
+     var contentString3 = '<div>'+
+     '<img src="https://raw.githubusercontent.com/antoninadab/glittermap/ebe4f204ba6a4c145ec03ee60466a2fb23a5a56d/1.jpg">'+   
+     '</div>';
+
+        var infowindow3 = new google.maps.InfoWindow({
+          content: contentString3
+        });
+
+        var nowyMarker3 = new google.maps.Marker({
+          position: wspolrzedneMarkera3,
+          map: map,
+          title: 'marker z okienkiem3'
+        });
+        nowyMarker3.addListener('click', function() {
+          infowindow3.open(map, nowyMarker3);
+        });
+    /* RĘCZNE DODAWANIE MARKERA - KONIEC3 */
+
+   /* RĘCZNE DODAWANIE MARKERA - POCZĄTEK 4 */ 
+    var wspolrzedneMarkera4 =  {lat:50.063469 , lng: 19.932885};
+
+     var contentString4 = '<div>'+
+     '<img src="https://raw.githubusercontent.com/antoninadab/glittermap/ebe4f204ba6a4c145ec03ee60466a2fb23a5a56d/2.jpg">'+    
+     '</div>';
+
+        var infowindow4 = new google.maps.InfoWindow({
+          content: contentString4
+        });
+
+        var nowyMarker4 = new google.maps.Marker({
+          position: wspolrzedneMarkera4,
+          map: map,
+          title: 'marker z okienkiem4'
+        });
+        nowyMarker4.addListener('click', function() {
+          infowindow4.open(map, nowyMarker4);
+        });
+    /* RĘCZNE DODAWANIE MARKERA - KONIEC4 */
+    
+    
+/* RĘCZNE DODAWANIE MARKERA - POCZĄTEK 5 */ 
+    var wspolrzedneMarkera5 =  {lat: 50.063524 , lng: 19.931812};
+
+     var contentString5 = '<div>'+
+     '<img src="https://raw.githubusercontent.com/antoninadab/glittermap/ebe4f204ba6a4c145ec03ee60466a2fb23a5a56d/4.jpg">'+    
+     '</div>';
+
+        var infowindow5 = new google.maps.InfoWindow({
+          content: contentString5
+        });
+
+        var nowyMarker5 = new google.maps.Marker({
+          position: wspolrzedneMarkera5,
+          map: map,
+          title: 'marker z okienkiem5'
+        });
+        nowyMarker5.addListener('click', function() {
+          infowindow5.open(map, nowyMarker5);
+        });
+    /* RĘCZNE DODAWANIE MARKERA - KONIEC 5 */
+
+    /* RĘCZNE DODAWANIE MARKERA - POCZĄTEK 6 */ 
+    var wspolrzedneMarkera6 =  {lat: 50.063497 , lng: 19.930289};
+
+     var contentString6 = '<div>'+
+     '<img src="https://raw.githubusercontent.com/antoninadab/glittermap/ebe4f204ba6a4c145ec03ee60466a2fb23a5a56d/6.JPG">'+ 
+     '</div>';
+
+        var infowindow6 = new google.maps.InfoWindow({
+          content: contentString6
+        });
+
+        var nowyMarker6 = new google.maps.Marker({
+          position: wspolrzedneMarkera6,
+          map: map,
+          title: 'marker z okienkiem6'
+        });
+        nowyMarker6.addListener('click', function() {
+          infowindow6.open(map, nowyMarker6);
+        });
+    /* RĘCZNE DODAWANIE MARKERA - KONIEC 6 */
+
+       /* RĘCZNE DODAWANIE MARKERA - POCZĄTEK 7 */ 
+    var wspolrzedneMarkera7 =   {lat: 50.063517,  lng: 19.932778};
+
+     var contentString7 = '<div>'+
+     '<img src="https://raw.githubusercontent.com/antoninadab/glittermap/ebe4f204ba6a4c145ec03ee60466a2fb23a5a56d/7.JPG">'+ 
+     '</div>';
+
+        var infowindow7 = new google.maps.InfoWindow({
+          content: contentString7
+        });
+
+        var nowyMarker7 = new google.maps.Marker({
+          position: wspolrzedneMarkera7,
+          map: map,
+          title: 'marker z okienkiem6'
+        });
+        nowyMarker7.addListener('click', function() {
+          infowindow7.open(map, nowyMarker7);
+        });
+    /* RĘCZNE DODAWANIE MARKERA - KONIEC 7 */
+
+   /* RĘCZNE DODAWANIE MARKERA - POCZĄTEK 8 */ 
+    var wspolrzedneMarkera8 =   {lat: 50.063462,  lng: 19.931698};  
+
+
+     var contentString8 = '<div>'+
+     '<img src="https://raw.githubusercontent.com/antoninadab/glittermap/ebe4f204ba6a4c145ec03ee60466a2fb23a5a56d/5.JPG">'+ 
+     '</div>';
+
+        var infowindow8 = new google.maps.InfoWindow({
+          content: contentString8
+        });
+
+        var nowyMarker8 = new google.maps.Marker({
+          position: wspolrzedneMarkera8,
+          map: map,
+          title: 'marker z okienkiem6'
+        });
+        nowyMarker8.addListener('click', function() {
+          infowindow8.open(map, nowyMarker8);
+        });
+    /* RĘCZNE DODAWANIE MARKERA - KONIEC 8 */
+
+    /* RĘCZNE DODAWANIE MARKERA - POCZĄTEK 9 */ 
+    var wspolrzedneMarkera9 =   {lat: 50.052168,  lng: 19.943232};    
+
+
+
+     var contentString9 = '<div>'+
+     '<img src="https://raw.githubusercontent.com/antoninadab/glittermap/ebe4f204ba6a4c145ec03ee60466a2fb23a5a56d/8%2C1.JPG">'+ 
+     '<img src="https://raw.githubusercontent.com/antoninadab/glittermap/ebe4f204ba6a4c145ec03ee60466a2fb23a5a56d/8.JPG">'+ 
+     '</div>';
+
+        var infowindow9 = new google.maps.InfoWindow({
+          content: contentString9
+        });
+
+        var nowyMarker9 = new google.maps.Marker({
+          position: wspolrzedneMarkera9,
+          map: map,
+          title: 'marker z okienkiem6'
+        });
+        nowyMarker9.addListener('click', function() {
+          infowindow9.open(map, nowyMarker9);
+        });
+    /* RĘCZNE DODAWANIE MARKERA - KONIEC 9 */
+
+     /* RĘCZNE DODAWANIE MARKERA - POCZĄTEK 10 */ 
+    var wspolrzedneMarkera10 =   {lat: 50.026694 ,  lng: 19.937654};    
+
+
+
+     var contentString10 = '<div>'+
+     '<img src="https://raw.githubusercontent.com/antoninadab/glittermap/ebe4f204ba6a4c145ec03ee60466a2fb23a5a56d/12.JPG">'+ 
+     '<img src="https://raw.githubusercontent.com/antoninadab/glittermap/ebe4f204ba6a4c145ec03ee60466a2fb23a5a56d/12,1.JPG">'+ 
+     '</div>';
+
+        var infowindow10 = new google.maps.InfoWindow({
+          content: contentString10
+        });
+
+        var nowyMarker10 = new google.maps.Marker({
+          position: wspolrzedneMarkera10,
+          map: map,
+          title: 'marker z okienkiem6'
+        });
+        nowyMarker10.addListener('click', function() {
+          infowindow10.open(map, nowyMarker10);
+        });
+    /* RĘCZNE DODAWANIE MARKERA - KONIEC 10*/
+
+     /* RĘCZNE DODAWANIE MARKERA - POCZĄTEK 11*/ 
+    var wspolrzedneMarkera11 =   {lat:50.026722 ,  lng: 19.938448};   
+
+
+
+     var contentString11 = '<div>'+
+     '<img src="https://raw.githubusercontent.com/antoninadab/glittermap/ebe4f204ba6a4c145ec03ee60466a2fb23a5a56d/11.JPG">'+ 
+     
+     '</div>';
+
+        var infowindow11 = new google.maps.InfoWindow({
+          content: contentString11
+        });
+
+        var nowyMarker11 = new google.maps.Marker({
+          position: wspolrzedneMarkera11,
+          map: map,
+          title: 'marker z okienkiem6'
+        });
+        nowyMarker11.addListener('click', function() {
+          infowindow11.open(map, nowyMarker11);
+        });
+    /* RĘCZNE DODAWANIE MARKERA - KONIEC 11*/
+
+
+  /* RĘCZNE DODAWANIE MARKERA - POCZĄTEK 12*/ 
+    var wspolrzedneMarkera12 =   {lat: 50.074611,  lng: 19.923295};   
+
+
+
+     var contentString12 = '<div>'+
+     '<img src="https://raw.githubusercontent.com/antoninadab/glittermap/ebe4f204ba6a4c145ec03ee60466a2fb23a5a56d/3.jpg">'+ 
+     
+     '</div>';
+
+        var infowindow12 = new google.maps.InfoWindow({
+          content: contentString12
+        });
+
+        var nowyMarker12 = new google.maps.Marker({
+          position: wspolrzedneMarkera12,
+          map: map,
+          title: 'marker z okienkiem6'
+        });
+        nowyMarker12.addListener('click', function() {
+          infowindow12.open(map, nowyMarker12);
+        });
+    /* RĘCZNE DODAWANIE MARKERA - KONIEC 12*/
+
+      }
+	  
+
+	  
+	   function drop() {
+        clearMarkers();
+        for (var i = 0; i < neighborhoods.length; i++) {
+          addMarkerWithTimeout(neighborhoods[i], i * 200);
+        }
+      }
+
+      function addMarkerWithTimeout(position, timeout) {
+        window.setTimeout(function() {
+          markers.push(new google.maps.Marker({
+            position: position,
+            map: map,
+            animation: google.maps.Animation.DROP
+          }));
+        }, timeout);
+      }
+
+      function clearMarkers() {
+        for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(null);
+        }
+        markers = [];
+	
+
+      }
+	  
+	
+	  
+    </script>
+
+    
+    
+    
+    <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js">
+    </script>
+
+
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdVNWkZgebJ8V93dPpHJQT4hSFcvb057Q&callback=initMap">
+    </script>
+     
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCdVNWkZgebJ8V93dPpHJQT4hSFcvb057Q&callback=initMap"
+    async defer></script>
+  </body>
+
+
+</html>
